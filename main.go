@@ -11,13 +11,13 @@ import (
 func main() {
 
 	liveHistogram := prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Name:    "live_response_seconds",
+		Name:    "debug_service_ready_response_seconds",
 		Help:    "Time to respond to liveness check",
 		Buckets: []float64{1, 2, 5, 6, 10},
 	}, []string{"code"})
 
 	readyHistogram := prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Name:    "ready_response_seconds",
+		Name:    "debug_service_ready_response_seconds",
 		Help:    "Time to respond to readiness check",
 		Buckets: []float64{1, 2, 5, 6, 10},
 	}, []string{"code"})

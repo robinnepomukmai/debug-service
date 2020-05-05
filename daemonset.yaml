@@ -21,7 +21,7 @@ spec:
           effect: NoSchedule
       containers:
         - name: debug-service
-          image: nepooomuk/debug-service
+          image: nepooomuk/debug-service:1
           resources:
             limits:
               memory: 200Mi
@@ -29,3 +29,38 @@ spec:
               cpu: 100m
               memory: 200Mi
       terminationGracePeriodSeconds: 30
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: debug-service
+  namespace: debug
+  labels:
+    app: debug-service
+spec:
+  selector:
+    app: debug-service
+  ports:
+    - name: metrics
+      port: 8080
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kube-monitoring-infra-prom-debug-service
+  namespace: monitoring
+  labels:
+    responsibility: innovo
+    app: debug-service
+spec:
+  endpoints:
+    - port: metrics
+      path: /metrics
+  namespaceSelector:
+    matchNames:
+      - debug
+  selector:
+    matchLabels:
+      app: debug-service
