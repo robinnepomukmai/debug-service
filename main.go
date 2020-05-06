@@ -31,6 +31,7 @@ func main() {
 }
 
 func measureHealthcheckLatency(histogram *prometheus.HistogramVec) http.HandlerFunc {
+	time.Sleep(1 * time.Second)
 	return func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		defer r.Body.Close()
