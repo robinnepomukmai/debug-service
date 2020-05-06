@@ -4,15 +4,19 @@ metadata:
   name: debug-service
   namespace: debug
   labels:
-    app: debug-service
+    k8s-app: debug-service
 spec:
   selector:
     matchLabels:
-      name: debug-service
+      k8s-app: debug-service
   template:
     metadata:
       labels:
-        name: debug-service
+        k8s-app: debug-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
     spec:
       tolerations:
         # this toleration is to have the daemonset runnable on master nodes
@@ -28,6 +32,14 @@ spec:
             requests:
               cpu: 100m
               memory: 200Mi
+          livenessProbe:
+            httpGet:
+              path: /live
+              port: 8080
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
       terminationGracePeriodSeconds: 30
 
 ---
@@ -37,10 +49,10 @@ metadata:
   name: debug-service
   namespace: debug
   labels:
-    app: debug-service
+    k8s-app: debug-service
 spec:
   selector:
-    app: debug-service
+    k8s-app: debug-service
   ports:
     - name: metrics
       port: 8080
@@ -53,7 +65,7 @@ metadata:
   namespace: monitoring
   labels:
     responsibility: innovo
-    app: debug-service
+    k8s-app: debug-service
 spec:
   endpoints:
     - port: metrics
@@ -63,4 +75,4 @@ spec:
       - debug
   selector:
     matchLabels:
-      app: debug-service
+      k8s-app: debug-service

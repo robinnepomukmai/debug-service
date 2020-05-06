@@ -3,15 +3,15 @@ package main
 import (
 	"fmt"
 	"github.com/prometheus/client_golang/prometheus"
-	"net/http"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"net/http"
 	"time"
 )
 
 func main() {
 
 	liveHistogram := prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Name:    "debug_service_ready_response_seconds",
+		Name:    "debug_service_live_response_seconds",
 		Help:    "Time to respond to liveness check",
 		Buckets: []float64{1, 2, 5, 6, 10},
 	}, []string{"code"})
@@ -22,12 +22,12 @@ func main() {
 		Buckets: []float64{1, 2, 5, 6, 10},
 	}, []string{"code"})
 
-	prometheus.Register(liveHistogram)
+	_ = prometheus.Register(liveHistogram)
 
 	http.Handle("/live", measureHealthcheckLatency(liveHistogram))
 	http.Handle("/ready", measureHealthcheckLatency(readyHistogram))
 	http.Handle("/metrics", promhttp.Handler())
-	http.ListenAndServe(":8080", nil)
+	_ = http.ListenAndServe(":8080", nil)
 }
 
 func measureHealthcheckLatency(histogram *prometheus.HistogramVec) http.HandlerFunc {
